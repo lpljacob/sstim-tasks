@@ -7,14 +7,14 @@ addpath([pwd '\data'])
 %%
 develop_mode = 1; % set to 1 to shorten the experiment for testing/debugging
 
-if develop_mode==1; trial_duration = 1; pause_time = 0.1; skip_tests = 1; else; trial_duration = 30; pause_time = 1; skip_tests = 0; end
+if develop_mode==1; trial_duration = 5; pause_time = 0.1; skip_tests = 1; else; trial_duration = 30; pause_time = 1; skip_tests = 0; end
 %% set up initial parameters
           
 x = inputdlg({'Enter subject number:','Enter visit number (1, 2, or 3):','Enter tapping list number (1, 2, or 3):'},...
               'Subject Info', [1 50; 1 50; 1 50]);
-value = questdlg('Select session type', ...
+sess_type = questdlg('Select session type', ...
 	'Experimenter input', ...
-	'Practice','Recall','Practice');
+	'Pre-sleep','Post-sleep','Pre-sleep');
           
 subjectNum = str2double(x{1});
 visitNum = str2double(x{2});
@@ -58,85 +58,90 @@ vars = struct();
 vars.trial_duration = trial_duration;
 vars.screenXpixels = screenXpixels;
 vars.screenYpixels = screenYpixels;    
+
 vars.window = window;
 vars.black = black;
+
+T = table(); 
 
 %%
 %--------------------------------------------------------------------------
 %                         Present Intructions
 %--------------------------------------------------------------------------
 
-if strcmp(value, 'Practice')
+if strcmp(sess_type, 'Pre-sleep') 
     
-    line1 = 'In this task, you will tap keys on the keyboard in specific sequences.';
-    line2 = '\n These sequences all use the numbers 1 to 4.';
-    line3 = '\n\n Rest all fingers (other than your thumb) of your left hand over those keys,';
-    line4 = '\n and use your little finger to press 1, your ring finger to press 2,';
-    line5 = '\n your middle finger to press 3, and your index finger to press 4.';
-    line6 = '\n \n \n Press any key to continue.';
+    if develop_mode==0
+        line1 = 'In this task, you will tap keys on the keyboard in specific sequences.';
+        line2 = '\n These sequences all use the numbers 1 to 4.';
+        line3 = '\n\n Rest all fingers (other than your thumb) of your left hand over those keys,';
+        line4 = '\n and use your little finger to press 1, your ring finger to press 2,';
+        line5 = '\n your middle finger to press 3, and your index finger to press 4.';
+        line6 = '\n \n \n Press any key to continue.';
+        
+        DrawFormattedText(window, [line1 line2 line3 line4 line5 line6 ],...
+            'center', screenYpixels * 0.25, black);
+        Screen('Flip', window);
+        
+        WaitSecs(pause_time);
+        KbStrokeWait;        
+        
+        % prompt through key presses 4-1  
+        Key1 = KbName('1!'); Key2 = KbName('2@'); Key3 = KbName('3#'); Key4 = KbName('4$');
+        
+        Screen('TextSize', window, 30);
+        DrawFormattedText(window, [line1 line2 line3 line4 line5],...
+            'center', screenYpixels * 0.25-100, black);
+        
+        Screen('TextSize', window, 50);
+        DrawFormattedText(window, 'Press 4 with your index finger.', 'center',...
+            'center', black);
+        Screen('Flip', window);
+                
+        response = 0;
+        
+        while response ~=4        
+            response = get_key(Key1, Key2, Key3, Key4);   
+        end
+        
+        Screen('TextSize', window, 30);
+        DrawFormattedText(window, [line1 line2 line3 line4 line5],...
+            'center', screenYpixels * 0.25-100, black);
+        
+        Screen('TextSize', window, 50);
+        DrawFormattedText(window, 'Now; press 3 with your middle finger.', 'center',...
+            'center', black);
+        Screen('Flip', window);
     
-    DrawFormattedText(window, [line1 line2 line3 line4 line5 line6 ],...
-        'center', screenYpixels * 0.25, black);
-    Screen('Flip', window);
+        while response ~=3  
+           response = get_key(Key1, Key2, Key3, Key4);
+        end
+        
+        Screen('TextSize', window, 30);
+        DrawFormattedText(window, [line1 line2 line3 line4 line5],...
+            'center', screenYpixels * 0.25-100, black);
+        
+        Screen('TextSize', window, 50);
+        DrawFormattedText(window, 'Now; press 2 with your ring finger.', 'center',...
+            'center', black);
+        Screen('Flip', window);
     
-    WaitSecs(pause_time);
-    KbStrokeWait;        
-    
-    % prompt through key presses 4-1  
-    Key1 = KbName('1!'); Key2 = KbName('2@'); Key3 = KbName('3#'); Key4 = KbName('4$');
-    
-    Screen('TextSize', window, 30);
-    DrawFormattedText(window, [line1 line2 line3 line4 line5],...
-        'center', screenYpixels * 0.25-100, black);
-    
-    Screen('TextSize', window, 50);
-    DrawFormattedText(window, 'Press 4 with your index finger.', 'center',...
-        'center', black);
-    Screen('Flip', window);
-            
-    response = 0;
-    
-    while response ~=4        
-        response = get_key(Key1, Key2, Key3, Key4);   
-    end
-    
-    Screen('TextSize', window, 30);
-    DrawFormattedText(window, [line1 line2 line3 line4 line5],...
-        'center', screenYpixels * 0.25-100, black);
-    
-    Screen('TextSize', window, 50);
-    DrawFormattedText(window, 'Now; press 3 with your middle finger.', 'center',...
-        'center', black);
-    Screen('Flip', window);
-
-    while response ~=3  
-       response = get_key(Key1, Key2, Key3, Key4);
-    end
-    
-    Screen('TextSize', window, 30);
-    DrawFormattedText(window, [line1 line2 line3 line4 line5],...
-        'center', screenYpixels * 0.25-100, black);
-    
-    Screen('TextSize', window, 50);
-    DrawFormattedText(window, 'Now; press 2 with your ring finger.', 'center',...
-        'center', black);
-    Screen('Flip', window);
-
-    while response ~=2
-        response = get_key(Key1, Key2, Key3, Key4);
-    end
-    
-    Screen('TextSize', window, 30);
-    DrawFormattedText(window, [line1 line2 line3 line4 line5],...
-        'center', screenYpixels * 0.25-100, black);
-    
-    Screen('TextSize', window, 50);
-    DrawFormattedText(window, 'Now, press 1 with your little finger.', 'center',...
-        'center', black);
-    Screen('Flip', window);
-    
-    while response ~=1        
-        response = get_key(Key1, Key2, Key3, Key4);
+        while response ~=2
+            response = get_key(Key1, Key2, Key3, Key4);
+        end
+        
+        Screen('TextSize', window, 30);
+        DrawFormattedText(window, [line1 line2 line3 line4 line5],...
+            'center', screenYpixels * 0.25-100, black);
+        
+        Screen('TextSize', window, 50);
+        DrawFormattedText(window, 'Now, press 1 with your little finger.', 'center',...
+            'center', black);
+        Screen('Flip', window);
+        
+        while response ~=1        
+            response = get_key(Key1, Key2, Key3, Key4);
+        end
     end
 %%
     %--------------------------------------------------------------------------
@@ -165,9 +170,6 @@ if strcmp(value, 'Practice')
     numCorrect = 0;
     
     while numCorrect < 2
-
-        T = table(); 
-        tempTable = table();
 
         for i = 1:ntrial
             Condition = {'Practice'};
@@ -211,7 +213,7 @@ if strcmp(value, 'Practice')
                     end                    
                 end
 
-                T = updateTable(T, Presses, Timings, i);
+                T = updateTable(T, Presses, Timings, seqString, Condition, i);
 
         if develop_mode==1; numCorrect=2; end
         
@@ -248,7 +250,7 @@ if strcmp(value, 'Practice')
     
     KbStrokeWait;
     
-    %load in and begin learning trials
+    % load in and begin learning trials
 
     numseq = readtable('numberseq.csv');
     learningTrials = table2array(numseq(:,listNum)); %3rd row as learning sequences
@@ -280,28 +282,17 @@ if strcmp(value, 'Practice')
 
         [Timings,Presses,seqString] = run_trial(i, learningTrials, vars);
 
-        T = updateTable(T, Presses, Timings, i);
+        T = updateTable(T, Presses, Timings, seqString, Condition, i);
         
     end    
 
-    writetable(T, sprintf('FingerTapping_subject%d_visit%d.csv',subjectNum, visitNum))
-
-    line1 = 'This stage is now over. Please notify the experimenter.';
-    
-    Screen('TextSize', window, 40);
-    DrawFormattedText(window, [line1 line2 line3 line4 line5 line6],...
-            'center', screenYpixels * 0.25, black);
-    Screen('Flip', window);
-        
-
-    wakeup=WaitSecs(pause_time);
-    sca;
+    writetable(T, [pwd '\data\' sprintf('FingerTapping_subject%d_visit%d.csv',subjectNum, visitNum)])
     
 %-------------------------------------------------------------%
 %----------------------RECALL PHASE---------------------------%
 %-------------------------------------------------------------%
 
-elseif strcmp(value, 'Recall')
+elseif strcmp(sess_type, 'Post-sleep')
     %code for recall trials
 
     line1 = 'You will now tap 3 sequences of numbers. Between';
@@ -328,8 +319,6 @@ elseif strcmp(value, 'Recall')
 
     ntrial = length(recallTrials);
     
-    tempTable = table();
-    
     [Timings,Presses,seqString] = run_trial(1, recallTrials, vars);
     
     for i = 2:ntrial
@@ -354,17 +343,15 @@ elseif strcmp(value, 'Recall')
         
     end    
 
-    writetable(T, [pwd '\data\' sprintf('FingerTapping_subject%d_visit%d.csv',subjectNum, visitNum)])
-
-    line1 = 'This stage is now over. Please notify the experimenter.';
-    
-    Screen('TextSize', window, 40);
-    DrawFormattedText(window, line1,...
-            'center', screenYpixels * 0.25, black);
-    Screen('Flip', window);
-        
-    WaitSecs(pause_time);
-    KbStrokeWait;
-    sca
-    
+    writetable(T, [pwd '\data\' sprintf('FingerTapping_subject%d_visit%d.csv',subjectNum, visitNum)])  
 end
+
+line1 = 'This stage is now over. Please notify the experimenter.';
+
+Screen('TextSize', window, 40);
+DrawFormattedText(window, line1,...
+        'center', screenYpixels * 0.25, black);
+Screen('Flip', window);
+    
+KbStrokeWait;
+sca

@@ -3,6 +3,8 @@ function [Timings,Presses,seqString] = run_trial(i, trial_info, vars)
 % initialize response recording
 Presses = [];
 Timings = [];
+
+seqString = num2str(trial_info(i));
     
 % set up 30 second timer 
 startSecs = GetSecs;
@@ -10,8 +12,6 @@ endTime = startSecs + vars.trial_duration;
 
 KbQueueCreate;
 KbQueueStart;
-
-seqString = num2str(trial_info(i));
 
 % separate numbers so they can be colored independently
 num1 = sprintf('%c - ', seqString(1));
@@ -21,10 +21,8 @@ num4 = sprintf('%c - ', seqString(4));
 num5 = sprintf('%c', seqString(5));
 
 % set up variables for coloring correctly pressed keys
-this_seq_num = str2double(trial_info(i));
-this_seq = num2str(this_seq_num)-'0';
 correct_idx = 1;
-next_correct = this_seq(correct_idx);
+next_correct = str2double(seqString(correct_idx));
 colors = zeros(5,3);
 
 while GetSecs < endTime
@@ -60,23 +58,23 @@ while GetSecs < endTime
 
     if pressed
         response = KbName(find(firstPress, 1, 'first'));
+        response = str2double(response(1));
+
         responseTime = firstPress(find(firstPress, 1, 'first'));
 
-        Presses(end+1) = response(1);
+        Presses(end+1) = response;
         Timings(end+1) = responseTime - startSecs;
 
-        if str2double(response(1)) == next_correct
+        if response == next_correct
             colors(correct_idx,:) = [0 1 0];    % set color matrix to [0 1 0] (green) for number if pressed correctly
-            correct_idx=1+correct_idx;          % next correct number in sequence
 
             if correct_idx==5
                 colors = zeros(5,3);            % reset sequence back to black once all 5 numbers are pressed 
                 correct_idx = 0;
             end 
             correct_idx=1+correct_idx;          % next correct number in sequence
-            next_correct = this_seq(correct_idx);
+            next_correct = str2double(seqString(correct_idx));
         end
     end
 end
 KbQueueStop;
-
