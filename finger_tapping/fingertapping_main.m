@@ -4,10 +4,15 @@ close all; clear; sca;
 
 addpath([pwd '\data'])
 
-%%
-develop_mode = 1; % set to 1 to shorten the experiment for testing/debugging
+ListenChar(0); % if matlab was prevented from listening to keys, allows it to do so again
 
-if develop_mode==1; trial_duration = 5; pause_time = 0.1; skip_tests = 1; else; trial_duration = 30; pause_time = 1; skip_tests = 0; end
+%%
+develop_mode = 0; % set to 1 to shorten the experiment for testing/debugging
+
+if develop_mode==1 
+    trial_duration = 5; pause_time = 0.1; skip_tests = 1; 
+else; trial_duration = 30; pause_time = 1; skip_tests = 1; 
+end
 %% set up initial parameters
           
 x = inputdlg({'Enter subject number:','Enter visit number (1, 2, or 3):','Enter tapping list number (1, 2, or 3):'},...
@@ -19,6 +24,9 @@ sess_type = questdlg('Select session type', ...
 subjectNum = str2double(x{1});
 visitNum = str2double(x{2});
 listNum = str2double(x{3});
+
+filename_presleep = [pwd '\data\' sprintf('FingerTapping_subject%d_visit%d_presleep',subjectNum, visitNum)];
+filename_postsleep = [pwd '\data\' sprintf('FingerTapping_subject%d_visit%d_postsleep',subjectNum, visitNum)];
 
 %% prepare screen and related properties
 
@@ -172,9 +180,10 @@ if strcmp(sess_type, 'Pre-sleep')
     while numCorrect < 2
 
         for i = 1:ntrial
-            Condition = {'Practice'};
 
-            [Timings,Presses,seqString] = run_trial(i, practiceTrials, vars); % make struct for inputs
+            sequence = practiceTrials(i);
+
+            [Timings,Presses,seqString] = run_trial(sequence, vars); % make struct for inputs
             
             numCorrect = numCorrect + strfind(seqString,Presses);
 
@@ -213,7 +222,7 @@ if strcmp(sess_type, 'Pre-sleep')
                     end                    
                 end
 
-                T = updateTable(T, Presses, Timings, seqString, Condition, i);
+                T = updateTable(T, Presses, Timings, seqString, 'Practice', i);
 
         if develop_mode==1; numCorrect=2; end
         
@@ -260,10 +269,12 @@ if strcmp(sess_type, 'Pre-sleep')
     learningTrials=learningTrials(idx);
     ntrial = length(learningTrials);
     
-    [Timings,Presses,seqString] = run_trial(1, learningTrials, vars);
+    sequence = learningTrials(1);
+
+    [Timings,Presses,seqString] = run_trial(sequence, vars);
+    T = updateTable(T, Presses, Timings, seqString, sess_type, 1);
 
     for i = 2:ntrial
-        Condition = {'Learning'};
 
         line1 = '\n Remember to type each sequence as quickly and';
         line2 = '\n accurately as you can, and to type them as many';
@@ -280,13 +291,16 @@ if strcmp(sess_type, 'Pre-sleep')
         WaitSecs(pause_time); 
         KbStrokeWait;
 
-        [Timings,Presses,seqString] = run_trial(i, learningTrials, vars);
+        sequence = learningTrials(i);
+        [Timings,Presses,seqString] = run_trial(sequence, vars);
 
-        T = updateTable(T, Presses, Timings, seqString, Condition, i);
+        T = updateTable(T, Presses, Timings, seqString, sess_type, i);
         
     end    
 
-    writetable(T, [pwd '\data\' sprintf('FingerTapping_subject%d_visit%d.csv',subjectNum, visitNum)])
+    
+%     writetable(T, filename)
+    save(filename_presleep,'T')
     
 %-------------------------------------------------------------%
 %----------------------RECALL PHASE---------------------------%
@@ -311,18 +325,19 @@ elseif strcmp(sess_type, 'Post-sleep')
 
     KbStrokeWait;
 
-    T = readtable(sprintf('FingerTapping_subject%d_visit%d.csv',subjectNum,visitNum), 'Format', 'auto');
+%     T = readtable(sprintf('FingerTapping_subject%d_visit%d.csv',subjectNum,visitNum), 'Format', 'auto');
+    load(filename_presleep,'T')
 
-    [r,c] = size(T);
-
-    recallTrials = T.Sequence(r-2:r);
+    recallTrials = table2cell(T(end-2:end,'Sequence'));
 
     ntrial = length(recallTrials);
+
+    sequence = recallTrials{1};
     
-    [Timings,Presses,seqString] = run_trial(1, recallTrials, vars);
+    [Timings,Presses,seqString] = run_trial(sequence, vars);
+    T = updateTable(T, Presses, Timings, seqString, sess_type, 1);
     
     for i = 2:ntrial
-        Condition = {'Learning'};
 
         line1 = '\n Remember to type each sequence as quickly and';
         line2 = '\n accurately as you can, and to type them as many';
@@ -339,11 +354,15 @@ elseif strcmp(sess_type, 'Post-sleep')
         WaitSecs(pause_time); 
         KbStrokeWait;
 
-        [Timings,Presses,seqString] = run_trial(i, recallTrials, vars);
+        sequence = recallTrials{i};
+        [Timings,Presses,seqString] = run_trial(sequence, vars);
+
+        T = updateTable(T, Presses, Timings, seqString, sess_type, i);
         
     end    
 
-    writetable(T, [pwd '\data\' sprintf('FingerTapping_subject%d_visit%d.csv',subjectNum, visitNum)])  
+%     writetable(T, [pwd '\data\' sprintf('FingerTapping_subject%d_visit%d_postsleep.csv',subjectNum, visitNum)])  
+    save(filename_postsleep,'T')
 end
 
 line1 = 'This stage is now over. Please notify the experimenter.';

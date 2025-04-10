@@ -1,10 +1,10 @@
-function [Timings,Presses,seqString] = run_trial(i, trial_info, vars)
+function [Timings,Presses,seqString] = run_trial(sequence, vars)
 
 % initialize response recording
 Presses = [];
 Timings = [];
 
-seqString = num2str(trial_info(i));
+seqString = num2str(sequence);
     
 % set up 30 second timer 
 startSecs = GetSecs;

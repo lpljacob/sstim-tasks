@@ -4,7 +4,7 @@ Presses = {Presses};
 Timings = {Timings};
 
 tempTable = table();
-tempTable.Condition(1,:) = Condition;
+tempTable.Condition(1,:) = {Condition};
 tempTable.Trial(1,:) = i;
 tempTable.Sequence(1,:) = seqString;
 tempTable.Presses = Presses;

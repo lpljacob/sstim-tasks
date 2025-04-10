@@ -11,6 +11,12 @@ Screen('Flip', vars.window);
 [~, keyCode, ~] = KbStrokeWait;
 if ~keyCode(vars.enter)
     response = run_recall(vars,this_cue);
+elseif length(response) < 3 && strcmp(vars.sess_type,'Post-sleep')
+    DrawFormattedText(vars.window, 'Make your best guess, even if you''re not sure. \n Press any button to go back.',...
+    'center', 'center', vars.black); 
+    Screen('Flip', vars.window); 
+    KbStrokeWait;
+    response = run_recall(vars,this_cue);
 end
 
 end

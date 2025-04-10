@@ -11,7 +11,7 @@ develop_mode = 0; % set to 1 to shorten the experiment for testing/debugging
 
 if develop_mode==1
     present_duration = 1; pause_time = 0.1; skip_tests = 1; isi = 0.1; minimum_recall = 0.01;
-else; present_duration = 4; pause_time = 1; skip_tests = 0; isi = 1; minimum_recall = 0.6;
+else; present_duration = 4; pause_time = 1; skip_tests = 1; isi = 1; minimum_recall = 0.6;
 end
 
 %% set up initial parameters
@@ -87,6 +87,7 @@ vars.typing_left_loc = screenXpixels * 0.25;
 vars.present_duration = present_duration;
 vars.isi = isi;
 vars.pause_time = pause_time;
+vars.sess_type = sess_type;
 
 results = table();
 
