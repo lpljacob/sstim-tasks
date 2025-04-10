@@ -2,9 +2,12 @@
 
 close all; clear; sca;
 
-addpath([pwd '\data'])
-
 ListenChar(0); % if matlab was prevented from listening to keys, allows it to do so again
+
+if ~isfolder([pwd '\data'])
+    mkdir([pwd '\data']);
+end
+addpath([pwd '\data'])
 
 %%
 develop_mode = 0; % set to 1 to shorten the experiment for testing/debugging
@@ -13,6 +16,7 @@ if develop_mode==1
     trial_duration = 5; pause_time = 0.1; skip_tests = 1; 
 else; trial_duration = 30; pause_time = 1; skip_tests = 1; 
 end
+
 %% set up initial parameters
           
 x = inputdlg({'Enter subject number:','Enter visit number (1, 2, or 3):','Enter tapping list number (1, 2, or 3):'},...

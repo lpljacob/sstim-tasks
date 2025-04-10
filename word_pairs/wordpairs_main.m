@@ -4,6 +4,9 @@ close all; clear; sca;
 
 ListenChar(0); % if matlab was prevented from listening to keys, allows it to do so again
 
+if ~isfolder([pwd '\data'])
+    mkdir([pwd '\data']);
+end
 addpath([pwd '\data'])
 
 %%
