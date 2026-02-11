@@ -13,8 +13,8 @@ addpath([pwd '\data'])
 develop_mode = 0; % set to 1 to shorten the experiment for testing/debugging
 
 if develop_mode==1 
-    trial_duration = 5; pause_time = 0.1; skip_tests = 1; 
-else; trial_duration = 30; pause_time = 1; skip_tests = 1; 
+    trial_duration = 5; pause_time = 0.1; break_time = 3; skip_tests = 1; 
+else; trial_duration = 30; pause_time = 1; break_time = 20; skip_tests = 1; 
 end
 
 %% set up initial parameters
@@ -280,6 +280,13 @@ if strcmp(sess_type, 'Pre-sleep')
 
     for i = 2:ntrial
 
+        Screen('TextSize', window, 40);
+        DrawFormattedText(window, 'Good job! Take a moment to rest. \n You will receive further instructions soon.',...
+            'center', screenYpixels * 0.25, black);
+        Screen('Flip', window);
+        
+        WaitSecs(break_time);
+
         line1 = '\n Remember to type each sequence as quickly and';
         line2 = '\n accurately as you can, and to type them as many';
         line3 = '\n times as you can within the time limit. Press ';
@@ -342,6 +349,13 @@ elseif strcmp(sess_type, 'Post-sleep')
     T = updateTable(T, Presses, Timings, seqString, sess_type, 1);
     
     for i = 2:ntrial
+
+        Screen('TextSize', window, 40);
+        DrawFormattedText(window, 'Good job! Take a moment to rest. \n You will receive further instructions soon.',...
+            'center', screenYpixels * 0.25, black);
+        Screen('Flip', window);
+        
+        WaitSecs(break_time);
 
         line1 = '\n Remember to type each sequence as quickly and';
         line2 = '\n accurately as you can, and to type them as many';
