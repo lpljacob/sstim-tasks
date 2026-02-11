@@ -1,4 +1,4 @@
-function results = learn_and_recall(vars, current_word_list, recall_thresh, message_thresh)
+function results = learn_and_recall(vars, current_word_list, minimum_recall, message_thresh)
 
 % display words for learning
 for t=1:height(current_word_list)
@@ -26,7 +26,7 @@ KbStrokeWait;
 current_recall = 0;
 
 iteration = 1;
-while current_recall < recall_thresh % repeats words until threshold is met
+while current_recall < minimum_recall % repeats words until threshold is met
 
     % determines which words to show this time
     if iteration == 1
@@ -68,7 +68,7 @@ while current_recall < recall_thresh % repeats words until threshold is met
     % set aside incorrect pairs to be repeated if necessary
     incorrect_word_list = this_iteration_list(~correct_pairs,:);
 
-    current_recall = sum(correct_pairs)/length(correct_pairs);
+    current_recall = height(correct_word_list)/(height(correct_word_list)+height(incorrect_word_list));
     iteration = iteration+1;
 end
 

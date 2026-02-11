@@ -9,7 +9,7 @@ if ~isfolder([pwd '\data'])
 end
 addpath([pwd '\data'])
 
-%%
+%% MAKE SURE DEVELOP MODE IS =0 FOR REAL EXPERIMENTS
 develop_mode = 0; % set to 1 to shorten the experiment for testing/debugging
 
 if develop_mode==1
@@ -67,9 +67,10 @@ Screen('BlendFunction', window, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
 % setting up layout
 [screenXpixels, screenYpixels] = Screen('WindowSize', window); 
 [xCenter, yCenter] = RectCenter(windowRect); 
-TextSizeRatio = .023;
+TextSizeRatio = .025;
 TextSize = round(res(1) * TextSizeRatio);
-Screen('Preference', 'DefaultFontSize', TextSize)
+%Screen('Preference', 'DefaultFontSize', TextSize)
+Screen('TextSize', window, TextSize);
 
 top_depth = screenYpixels * 0.25;
 bottom_depth = screenYpixels - screenYpixels * 0.25;
@@ -126,7 +127,7 @@ if strcmp(sess_type, 'Pre-sleep')
         KbStrokeWait; 
 
         % shuffle list and add variable properties to each pair
-        current_word_list = prepareWordList(practice_pairs);
+        current_word_list = prepareWordList(practice_pairs, 'practice');
 
         % run learning and recall phases
         message_thresh = ['Practice trials will continue until both answers are correct.'...
@@ -155,7 +156,7 @@ if strcmp(sess_type, 'Pre-sleep')
     KbStrokeWait;
 
     % shuffle list and add variable properties to each pair
-    current_word_list = prepareWordList(pairs);
+    current_word_list = prepareWordList(pairs, str2double(x{3}));
 
 
      % run learning and recall phases
