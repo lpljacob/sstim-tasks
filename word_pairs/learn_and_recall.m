@@ -57,6 +57,7 @@ while current_recall < minimum_recall % repeats words until threshold is met
 
     % determine which pairs were correct
     correct_pairs = strcmp(this_iteration_list.recall,this_iteration_list.response);
+    this_iteration_list.correct = correct_pairs;
 
     % save correct pairs
     if iteration==1

@@ -10,7 +10,7 @@ end
 addpath([pwd '\data'])
 
 %% MAKE SURE DEVELOP MODE IS =0 FOR REAL EXPERIMENTS
-develop_mode = 0; % set to 1 to shorten the experiment for testing/debugging
+develop_mode = 1; % set to 1 to shorten the experiment for testing/debugging
 
 if develop_mode==1
     present_duration = 1; pause_time = 0.1; skip_tests = 1; isi = 0.1; minimum_recall = 0.01;
@@ -195,6 +195,12 @@ elseif strcmp(sess_type, 'Post-sleep')
     for t=1:height(learning_table) 
         learning_table.postSleepResponse{t} = run_recall(vars, learning_table.cue{t}); % run function to obtain subject response
     end
+
+    learning_table = movevars(learning_table, 'postSleepResponse', 'After', 'correct');
+    learning_table = addvars(learning_table, ...
+    repelem(0, height(learning_table))', ...
+    'NewVariableNames','correct_postSleep');
+    learning_table = movevars(learning_table, 'correct_postSleep', 'After', 'postSleepResponse');
 
     writetable(learning_table, [pwd '\data\' sprintf('WordPairs_subject%d_visit%d_postsleep.csv',subjectNum, visitNum)])
 
